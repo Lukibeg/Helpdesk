@@ -6,12 +6,17 @@ use app\model\Database;
 
 class HomeModel
 {
+    private ?Database $database = null;
+    public function __construct(Database $database)
+    {
+        $this->database = $database;
+    }
     public function getUsers()
     {
-        $pdo = Database::connect();
+        $pdo = $this->database->connect();
 
         try {
-            $stmt = $pdo->query("SELECT * FROM userss");
+            $stmt = $pdo->query("SELECT * FROM users");
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             return ['success' => true, 'data' => $result];
         } catch (\PDOException $e) {

@@ -2,6 +2,8 @@
 
 namespace core;
 
+use GuzzleHttp\Psr7\Response;
+
 class SessionManager
 {
 
@@ -25,12 +27,37 @@ class SessionManager
     {
         $_SESSION[$key] = $value;
     }
-    public function getSession($key)
+
+    public function regenerateSession()
     {
-        return $_SESSION[$key];
+        session_regenerate_id(true);
     }
+
+    public function getUserSession()
+    {
+        if (isset($_SESSION['user']) && $_SESSION['user'] !== null) {
+            return $_SESSION['user'];
+        } else {
+            $this->destroySession();
+            return new Response(401, ['Location' => '/login']);
+        }
+    }
+
+    public function getSuccessSession()
+    {
+        return $_SESSION['success'] ?? false;
+    }
+
+    public function getErrorSession()
+    {
+        return $_SESSION['error'] ?? false;
+    }
+
+
     public function destroySession()
     {
-        unset($_SESSION['user']);
+        unset($_SESSION);
+        session_destroy();
+        return new Response(302, ['Location' => '/login']);
     }
 }

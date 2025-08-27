@@ -1,24 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\controllers;
-use app\model\HomeModel;
+
+use app\model\ListTasksModel;
 use function app\helpers\view;
+use core\SessionManager;
 
 
 class HomeController
 {
+    private static ?array $user = null;
+    private ListTasksModel $listTasksModel;
 
-    public function index()
+    public function __construct(ListTasksModel $listTasksModel)
     {
-        $homeModel = new HomeModel();
-        $users = $homeModel->getUsers();
-        $nome = 'Lucas';
-        $title = 'Home';
-        view('home', ['title' => $title, 'nome' => $nome, 'users' => $users]);
+        self::$user = SessionManager::getInstance()->getUserSession();
+        $this->listTasksModel = $listTasksModel;
     }
 
-    public function sobre()
+    public function index(): void
     {
-        echo "Sobre nós!";
+        $tasks = $this->listTasksModel->listTasks(self::$user['username']);
+        if (self::$user['perfil'] === 'admin') {
+            header('Location: /home-admin');
+            exit;
+        }
+        view('home', ['title' => 'Home', 'data' => self::$user, 'tasks' => $tasks['data'], 'status' => $tasks['status']]);
     }
 }

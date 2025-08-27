@@ -2,11 +2,26 @@
 
 namespace app\helpers;
 
+use core\SessionManager;
+
+function hasPermission($userRole, $permission): bool
+{
+    $roleAndPermission = ['admin' => ['view', 'delete', 'update'], 'common' => ['view', 'create']];
+    return in_array($permission,   $roleAndPermission[$userRole]);
+}
+
+function getUserRole(): string
+{
+    return SessionManager::getInstance()->getUserSession()['perfil'];
+}
+
+
 function view(string $viewName, array $data = [], bool $useLayout = true)
 {
     extract($data);
 
     if ($useLayout) {
+        
         require_once base_path("app/view/header.php");
     }
 

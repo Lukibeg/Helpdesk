@@ -6,15 +6,19 @@ use app\model\Database;
 
 class ListUsersModel
 {
+    private ?Database $database = null;
+    public function __construct(Database $database)
+    {
+        $this->database = $database;
+    }
     public function listUsersJson()
     {
-        $pdo = Database::connect();
+        $pdo = $this->database->connect();
 
         try {
-            $stmt = $pdo->query("SELECT * FROM users");
+            $stmt = $pdo->query("SELECT id, username, email, perfil FROM users");
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            return ['success' => true, 'data' => $result];
-
+            return ['status' => 'success', 'data' => $result];
         } catch (\PDOException $e) {
             $debug = $_ENV['APP_DEBUG'] ?? false;
             if ($debug) {
