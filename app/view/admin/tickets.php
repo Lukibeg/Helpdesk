@@ -1,3 +1,5 @@
+<?php $this->layout('layout'); ?>
+
 <div class="admin-tickets-container">
     <div class="helpdesk">
 

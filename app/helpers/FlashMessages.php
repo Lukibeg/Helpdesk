@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Helpers;
+namespace app\helpers;
 
 trait FlashMessages
 {
-    private static function setFlash($message, $type)
+    private function setFlash($message, $type)
     {
         $_SESSION['flash'] = [
             'message' => $message,

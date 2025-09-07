@@ -5,24 +5,27 @@ namespace app\controllers;
 use app\model\HomeAdminModel;
 use core\SessionManager;
 use Psr\Http\Message\ResponseInterface;
-use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
 use function app\helpers\hasPermission;
-use function app\helpers\view;
+use League\Plates\Engine;
 
 
 class HomeAdminController
 {
-    private static $user = null;
+    private ?array $user = null;
+    private Engine $engine;
     private HomeAdminModel $homeAdminModel;
-    public function __construct(HomeAdminModel $homeAdminModel)
+    public function __construct(HomeAdminModel $homeAdminModel, Engine $engine)
     {
-        self::$user = SessionManager::getInstance()->getUserSession();
+        $this->user = SessionManager::getInstance()->getUserSession();
+        $this->engine = $engine;
         $this->homeAdminModel = $homeAdminModel;
     }
     public function index(ServerRequestInterface $request): ResponseInterface
     {
-        if (!hasPermission(self::$user['perfil'], 'delete')) {
+
+        if (!hasPermission($this->user['perfil'], 'delete')) {
             return new Response(401, [], 'Sem permissão');
         }
 
@@ -41,16 +44,17 @@ class HomeAdminController
             }
         }
         $stats['active_users'] = count($users);
-        return new Response(200, [], view('home-admin', ['title' => 'Home Admin', 'data' => self::$user, 'tasks' => $tasks, 'stats' => $stats]));
+        return new Response(200, [], $this->engine->render('home-admin', ['title' => 'Home Admin', 'data' => $this->user, 'tasks' => $tasks, 'stats' => $stats]));
     }
 
     public function tickets(ServerRequestInterface $request): ResponseInterface
     {
-        if (!hasPermission(self::$user['perfil'], 'delete')) {
+
+        if (!hasPermission($this->user['perfil'], 'delete')) {
             return new Response(401, [], 'Sem permissão');
         }
 
         $tasks = $this->homeAdminModel->getAllTasks();
-        return new Response(200, [], view('admin/tickets', ['title' => 'Tickets', 'data' => self::$user, 'tasks' => $tasks]));
+        return new Response(200, [], $this->engine->render('admin/tickets', ['title' => 'Tickets', 'data' => $this->user, 'tasks' => $tasks]));
     }
 }

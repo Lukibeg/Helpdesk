@@ -7,11 +7,12 @@ use app\model\LoginModel;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use \app\helpers\FlashMessages;
+
 
 class LoginController
 {
-
-    use \app\helpers\FlashMessages;
+    use FlashMessages;
     private ?SessionManager $sessionManager;
     private ?string $username;
     private ?string $password;
@@ -46,13 +47,13 @@ class LoginController
 
     public function login(ServerRequestInterface $request): ResponseInterface
     {
-
         $data = $request->getParsedBody();
         $this->setUser($data['username'] ?? '');
         $this->setPassword($data['password'] ?? '');
 
         if (empty($this->getUser()) || empty($this->getPassword())) {
-            return new Response(302, ['Location' => '/login?error=true']);
+            $this->setFlash('Por favor, preencha todos os campos', 'error');
+            return new Response(302, ['Location' => '/login']);
         }
 
         if ($this->getUser() != null && $this->getPassword() != null) {
@@ -66,10 +67,11 @@ class LoginController
                     return new Response(302, ['Location' => '/']);
                 }
             } else {
-                $this->setFlash('error', 'Credenciais inválidas');
+                $this->setFlash('Credenciais inválidas', 'error');
                 return new Response(302, ['Location' => '/login']);
             }
         }
+        $this->setFlash('Ocorreu um erro inesperado', 'error');
         return new Response(302, ['Location' => '/login']);
     }
 }

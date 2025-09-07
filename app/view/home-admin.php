@@ -1,7 +1,8 @@
+<?php $this->layout('layout'); ?>
 <div class="home-admin-container">
     <div class="admin-header">
         <h1>👨‍💼 Painel Administrativo</h1>
-        <h2>Bem-vindo, <?= htmlspecialchars($data['username'] ?? 'Administrador') ?>!</h2>
+        <h2>Bem-vindo, <?= $this->e($data['username'] ?? 'Administrador') ?>!</h2>
         <p>Gerencie todos os chamados e usuários do sistema</p>
     </div>
 

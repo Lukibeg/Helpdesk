@@ -4,20 +4,20 @@ namespace core;
 
 use DI\ContainerBuilder;
 use app\model\Database;
+use League\Plates\Engine;
+
 
 $builder = new ContainerBuilder();
 
 //Autowiring on
-// $builder->addDefinitions([
+$builder->addDefinitions([
 
-//     Database::class => \DI\create(Database::class),
-
-//     HomeAdminModel::class => \DI\create(HomeAdminModel::class)
-//         ->constructor(\DI\get(Database::class)),
-
-//     HomeAdminController::class => \DI\create(HomeAdminController::class)
-//         ->constructor(\DI\get(HomeAdminModel::class)),
-// ]);
+    Database::class => \DI\create(Database::class),
+    Engine::class => function () {
+        $templates = __DIR__ . '/../app/view';
+        return new Engine($templates);
+    },
+]);
 
 $container = $builder->build();
 

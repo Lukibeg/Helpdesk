@@ -1,3 +1,6 @@
+<?php $this->layout('layout'); ?>
+
+
 <div class="create-helpdesk-container">
     <div class="form-header">
         <h1>📝 Criar Novo Chamado</h1>

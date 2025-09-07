@@ -1,13 +1,18 @@
+<?php $this->layout('layout'); ?>
+
 <div class="login-container">
     <div class="login-title">
         <h2>Register</h2>
     </div>
 
-    <?php if (isset($_GET['error']) && $_GET['error'] === 'true') : ?>
+    <?php if (isset($_SESSION['flash']['type']) && $_SESSION['flash']['type'] === 'error'): ?>
         <div id="error">
-            <p>Erro ao registrar usuário</p>
+            <p><?= htmlspecialchars($_SESSION['flash']['message']) ?></p>
         </div>
+        <?php unset($_SESSION['flash']); ?>
     <?php endif; ?>
+
+
 
     <div class="login-form">
         <form method="post" action="/register">
@@ -26,3 +31,4 @@
         </form>
     </div>
 </div>
+<?php $this->insert('footer'); ?>

@@ -11,7 +11,6 @@ SessionManager::getInstance();
 
 $middlewareStack = new MiddlewareStack();
 $middlewareStack->add(new core\AuthMiddleware());
-$middlewareStack->process();
 
 require_once __DIR__ . '/../core/Container.php';
 $router = new Router($container);
@@ -35,18 +34,31 @@ $creator = new \Nyholm\Psr7Server\ServerRequestCreator(
 
 $serverRequest = $creator->fromGlobals();
 
-$result = $router->dispatch($uri, $method, $serverRequest);
+$response = $middlewareStack->process($serverRequest);
 
-http_response_code($result->getStatusCode());
+if ($response !== null) {
+    http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+        foreach ($values as $value) {
+            header("$name: $value", false);
+        }
+    }
+    echo $response->getBody();
+    exit;
+}
 
-foreach ($result->getHeaders() as $name => $values) {
+$response = $router->dispatch($uri, $method, $serverRequest);
+http_response_code($response->getStatusCode());
+foreach ($response->getHeaders() as $name => $values) {
     foreach ($values as $value) {
-        header(sprintf('%s: %s', $name, $value), false);
+        header("$name: $value", false);
     }
 }
-echo $result->getBody();
 
-if ($result === false) {
+echo $response->getBody();
+exit;
+
+if ($response !== null) {
     if ($isApi) {
         http_response_code(404);
         header('Content-Type: application/json');

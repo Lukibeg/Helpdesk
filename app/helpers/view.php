@@ -6,6 +6,9 @@ use core\SessionManager;
 
 function hasPermission($userRole, $permission): bool
 {
+    if($userRole === null){
+        return false;
+    }
     $roleAndPermission = ['admin' => ['view', 'delete', 'update'], 'common' => ['view', 'create']];
     return in_array($permission,   $roleAndPermission[$userRole]);
 }

@@ -10,6 +10,7 @@ $dotenv->load();
 
 // Carregar helpers
 require_once __DIR__ . '/../../app/helpers/view.php';
+require_once __DIR__ . '/../../app/helpers/FlashMessages.php';
 
 // Configurações globais
 error_reporting(E_ALL);

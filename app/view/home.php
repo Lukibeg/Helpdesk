@@ -4,6 +4,7 @@
     use function app\helpers\hasPermission;
 
     ?>
+    <?= $this->layout('layout'); ?>
 
     <div class="home-container">
         <h1>Bem-vindo, <?= htmlspecialchars($data['username'] ?? 'Usuário') ?>!</h1>
@@ -36,7 +37,6 @@
                     </div>
                 <?php else: ?>
 
-
                     <?php foreach ($tasks as $task): ?>
                         <div class="helpdesk-item">
                             <h4><?= htmlspecialchars($task['title']) ?></h4>
@@ -63,10 +63,4 @@
                 </div>
             <?php endif ?>
         </div>
-
-        <?php if (isset($error)): ?>
-            <div id="error">
-                <p><?= htmlspecialchars($error) ?></p>
-            </div>
-        <?php endif; ?>
     </div>

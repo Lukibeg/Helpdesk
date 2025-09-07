@@ -1,24 +1,34 @@
 <?php
+
 namespace core;
 
-//Criar uma pilha de middlewares que serão executadas em ordem específica.
-//Primeiro passo criar uma classe para gerenciar a pilha de middlewares, onde teremos um array de middlewares e métodos para adicionar e executar os middlewares.
-//Todas as classes de middlewares devem implementar a interface MiddlewareInterface.
-class MiddlewareStack{
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+class MiddlewareStack
+{
     private $middlewares = [];
 
-    public function add(MiddlewareInterface $middleware){
+    public function add(MiddlewareInterface $middleware)
+    {
         $this->middlewares[] = $middleware;
     }
 
-    public function process(){
-        foreach($this->middlewares as $middleware){
-            $middleware->handle();
+    public function process(ServerRequestInterface $request): ?ResponseInterface
+    {
+        foreach ($this->middlewares as $middleware) {
+            $response = $middleware->handle($request);
+            if ($response !== null) {
+                return $response; // Ex: redirecionamento
+            }
         }
+
+        return null; // Nenhuma middleware barrou
     }
 }
 
 
-interface MiddlewareInterface{
-    public function handle();
+interface MiddlewareInterface
+{
+    public function handle(ServerRequestInterface $request): ?ResponseInterface;
 }

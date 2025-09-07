@@ -6,23 +6,25 @@ use app\model\ViewTaskModel;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
-use function app\helpers\view;
+use League\Plates\Engine;
 
 class ViewTaskController
 {
     private ViewTaskModel $viewTaskModel;
-    public function __construct(ViewTaskModel $viewTaskModel)
+    private Engine $engine;
+    public function __construct(ViewTaskModel $viewTaskModel, Engine $engine)
     {
         $this->viewTaskModel = $viewTaskModel;
+        $this->engine = $engine;
     }
     public function viewTask(ServerRequestInterface $request): ResponseInterface
     {
         $id = $request->getAttribute('id');
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if (!$id) {
-            return new Response(400, [], 'ID inválido');
+            return new Response(404, [], $this->engine->render('404'));
         }
         $task = $this->viewTaskModel->getTask($id);
-        return new Response(200, [], view('view-tasks', ['title' => 'Chamado', 'data' => $task]));
+        return new Response(200, [], $this->engine->render('view-tasks', ['title' => 'Chamado', 'data' => $task]));
     }
 }

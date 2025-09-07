@@ -6,9 +6,11 @@ use app\model\RegisterUserModel;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use \app\helpers\FlashMessages;
 
 class RegisterController
 {
+    use FlashMessages;
     private RegisterUserModel $registerUserModel;
     public function __construct(RegisterUserModel $registerUserModel)
     {
@@ -22,17 +24,20 @@ class RegisterController
         if (array_key_exists('username', $data) && array_key_exists('password', $data) && array_key_exists('email', $data) && array_key_exists('perfil', $data)) {
 
             if (empty($data['username']) || empty($data['password']) || empty($data['email'])) {
-                return new Response(302, ['Location' => '/register?error=true']);
+                $this->setFlash('Erro ao cadastrar usuário', 'error');
+                return new Response(302, ['Location' => '/register']);
             } else {
                 $password = password_hash($data['password'], PASSWORD_ARGON2I);
                 $result = $this->registerUserModel->registerUser($data['username'], $password, $data['email'], $data['perfil']);
                 if ($result['status'] === 'success') {
-                    return new Response(302, ['Location' => '/login?success=true']);
+                    $this->setFlash('Usuário cadastrado com sucesso', 'error');
+                    return new Response(302, ['Location' => '/login']);
                 } else {
-                    return new Response(302, ['Location' => '/register?error=true']);
+                    $this->setFlash('Erro ao cadastrar usuário', 'error');
+                    return new Response(302, ['Location' => '/register']);
                 }
             }
         }
-        return new Response(302, ['Location' => '/register?error=true']);
+        return new Response(302, ['Location' => '/register']);
     }
 }

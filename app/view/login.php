@@ -1,12 +1,12 @@
+<?php $this->layout('layout'); ?>
 <div class="login-container">
-
     <div class="login-title">
         <h2>Login</h2>
     </div>
 
-    <?php if (isset($_SESSION['flash']['message']) && $_SESSION['flash']['message'] === 'error') : ?>
+    <?php if (isset($_SESSION['flash']['type']) && $_SESSION['flash']['type'] === 'error'): ?>
         <div id="error">
-            <p>Usuário ou senha inválidos</p>
+            <p><?= htmlspecialchars($_SESSION['flash']['message']) ?></p>
         </div>
         <?php unset($_SESSION['flash']); ?>
     <?php endif; ?>

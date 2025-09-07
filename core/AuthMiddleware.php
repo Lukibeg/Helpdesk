@@ -1,26 +1,34 @@
 <?php
 
 namespace core;
-//Quando eu passo parâmetros para /login?error=true, o middleware me redireciona para /login.
-//Quando eu passo parâmetros para /register?error=true, o middleware me redireciona para /register.
-//Quando eu passo parâmetros para /login?success=true, o middleware me redireciona para /login.
-//Quando eu passo parâmetros para /register?success=true, o middleware me redireciona para /register.
-//O ideal é que o middleware permita a esses parâmetros serem passados para a página.
+
+use Psr\Http\Message\ResponseInterface;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AuthMiddleware implements MiddlewareInterface
 {
-    public function handle()
+    public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $path = $uri;
 
         if (!array_key_exists('user', $_SESSION) && $uri !== '/login' && $uri !== '/register') {
-            header('Location: /login');
-            exit;
+            return new Response(302, ['Location' => '/login']);
         }
 
         if (array_key_exists('user', $_SESSION) && $uri === '/login') {
-            header('Location: /');
-            exit;
+            return new Response(302, ['Location' => '/']);
         }
+
+        // Se for rota protegida, diz pro browser não guardar
+        if (!in_array($path, ['/login', '/register'])) {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        }
+
+        // Nenhum problema -> deixa o fluxo seguir
+        return null;
     }
 }
